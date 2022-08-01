@@ -1,31 +1,41 @@
 package ee.verx.arbeix;
 
+import ee.verx.arbeix.placeholder.Placeholder;
 import ee.verx.arbeix.placeholder.Replacement;
 import ee.verx.arbeix.placeholder.Replacer;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 
-import java.util.Calendar;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class Main {
 
   public static void main(String[] args) throws Exception {
-    @SuppressWarnings("SpellCheckingInspection")
-    var examplePlaceholders =
-        Map.ofEntries(
-            Map.entry("KLIENT_NIMI", new Replacement.Text("Peeter Oja")),
-            Map.entry("KLIENT_ETTEVOTE", new Replacement.Text("Eraisik")),
-            Map.entry("KLIENT_TELEFON", new Replacement.Text("+372 5555 555")),
-            Map.entry("KLIENT_EKIRI", new Replacement.Email("email@gmail.com")),
-            Map.entry("KLIENT_OBJEKT", new Replacement.Text("Tamsalu")),
-            Map.entry("KUUPAEV", new Replacement.Date(2020, Calendar.MAY, 11)),
-            Map.entry("HINNAPAKKUMINE_NR", new Replacement.Text("123456")));
+    var examplePlaceholders = new HashMap<String, Replacement>();
+    var scanner = new Scanner(System.in);
+    for (var placeholder : Placeholder.values()) {
+      System.out.printf("%s / %s / %s >> ", placeholder.localName(), placeholder.name(), placeholder.type());
+      String input = scanner.nextLine();
+      Replacement replacement = switch (placeholder.type()) {
+        case TEXT -> new Replacement.Text(input);
+        case EMAIL -> new Replacement.Email(input);
+        case DATE -> {
+          var parts = input.split("/");
+          yield new Replacement.Date(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        }
+      };
+      examplePlaceholders.put(placeholder.localName(), replacement);
+    }
 
-    try (var ods = OdfSpreadsheetDocument.loadDocument(args[0])) {
+    Path source = Path.of(args[0]);
+    Path target = source.resolveSibling(source.getFileName().toString().replaceFirst("[.][^.]+$", "") + ".mod.ods");
+
+    try (var ods = OdfSpreadsheetDocument.loadDocument(source.toFile())) {
       var tables = ods.getSpreadsheetTables();
       Replacer.replaceAllInTable(
           tables.get(0), i -> examplePlaceholders.getOrDefault(i, new Replacement.None()));
-      ods.save(args[1]);
+      ods.save(target.toFile());
     }
   }
 }
