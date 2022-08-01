@@ -1,18 +1,17 @@
 package ee.verx.arbeix;
 
-import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Node;
+import static java.lang.System.out;
 
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-
-import static java.lang.System.out;
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Node;
 
 public class NodePrinter {
 
