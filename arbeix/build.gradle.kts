@@ -17,6 +17,7 @@ dependencies {
         exclude("xml-apis")
         exclude("io.github.git-commit-id")
     }
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
 }
 
 extraJavaModuleInfo {
