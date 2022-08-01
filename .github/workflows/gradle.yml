@@ -34,3 +34,8 @@ jobs:
         arguments: build
     - name: Package
       run: 'jpackage --name Arbeix -p build/libs/ -m ee.verx.arbeix/ee.verx.arbeix.Main --type dmg -d build/distribute --jlink-options "--no-man-pages --no-header-files --strip-native-commands --compress=2"'
+    - name: Artifacts
+      uses: actions/upload-artifact@v3.1.0
+      with:
+        name: ArbeixDMG
+        path: build/distribute
