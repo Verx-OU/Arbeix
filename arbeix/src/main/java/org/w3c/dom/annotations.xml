@@ -1,6 +1,5 @@
 <root>
-  <item name='org.w3c.dom.Node org.w3c.dom.NamedNodeMap getAttributes()'>
-    <annotation name='org.jetbrains.annotations.Nullable'>
-    </annotation>
-  </item>
+    <item name='org.w3c.dom.Node org.w3c.dom.NamedNodeMap getAttributes()'>
+        <annotation name='org.jetbrains.annotations.Nullable'/>
+    </item>
 </root>

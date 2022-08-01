@@ -42,7 +42,6 @@ public class NodePrinter {
     else System.out.printf(" '%s'%n", node.getNodeValue());
 
     var attributes = node.getAttributes();
-    //noinspection ConstantConditions
     if (attributes != null) {
       for (int i = 0; i < attributes.getLength(); i++) {
         out.printf(
