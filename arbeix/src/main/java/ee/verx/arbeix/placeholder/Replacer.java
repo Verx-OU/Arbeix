@@ -30,9 +30,9 @@ public class Replacer {
           var replacement = processor.apply(matcher.group(1));
           out.println(replacement);
 
-          if (replacement instanceof Placeholder.Date date) {
+          if (replacement instanceof Replacement.Date date) {
             cell.setDateValue(date.toCalendar());
-          } else if (replacement instanceof Placeholder.Email email) {
+          } else if (replacement instanceof Replacement.Email email) {
             cell.setDisplayText(null);
             var textElement = cell.getOdfElement().getFirstChildElement();
             var linkElement = new TextAElement((OdfFileDom) textElement.getOwnerDocument());
@@ -40,7 +40,7 @@ public class Replacer {
             linkElement.setXlinkTypeAttribute(XlinkTypeAttribute.Value.SIMPLE.toString());
             linkElement.appendChild(textElement.getOwnerDocument().createTextNode(email.value()));
             textElement.appendChild(linkElement);
-          } else if (replacement instanceof Placeholder.Text text) {
+          } else if (replacement instanceof Replacement.Text text) {
             cell.setDisplayText(text.value());
           }
 
@@ -52,5 +52,5 @@ public class Replacer {
   }
 
   @FunctionalInterface
-  public interface PlaceholderProcessor extends Function<String, @NotNull Placeholder> {}
+  public interface PlaceholderProcessor extends Function<String, @NotNull Replacement> {}
 }
