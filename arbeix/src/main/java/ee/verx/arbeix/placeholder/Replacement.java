@@ -1,21 +1,31 @@
 package ee.verx.arbeix.placeholder;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.jetbrains.annotations.NotNull;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import org.jetbrains.annotations.NotNull;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.PROPERTY, property="type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = Replacement.Text.class, name = "text"),
-        @JsonSubTypes.Type(value = Replacement.Email.class, name = "email"),
-        @JsonSubTypes.Type(value = Replacement.Date.class, name = "date")})
 public sealed interface Replacement {
-  record Text(String value) implements Replacement {}
-  record Email(String value) implements Replacement {}
+  record Text(String value) implements Replacement {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public Text {}
+  }
+
+  record Number(double value) implements Replacement {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public Number {}
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public Number(int integer) {
+      this((double) integer);
+    }
+  }
+
+  record Email(String value) implements Replacement {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public Email {}
+  }
+
   record Date(int year, int month, int day) implements Replacement {
     public @NotNull Calendar toCalendar() {
       var date = GregorianCalendar.getInstance();
@@ -24,5 +34,6 @@ public sealed interface Replacement {
       return date;
     }
   }
+
   record None() implements Replacement {}
 }
