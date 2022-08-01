@@ -15,6 +15,25 @@ import org.w3c.dom.NodeList;
 public class Replacer {
   static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{\\{(\\*?)(\\w+)}}");
 
+  static ColRow getAbsoluteCellAddress(int colIndex, int rowIndex) {
+    int remainder;
+    int multiple = colIndex;
+    StringBuilder cellRange = new StringBuilder();
+    while (multiple != 0) {
+      multiple = colIndex / 26;
+      remainder = colIndex % 26;
+      char c;
+      if (multiple == 0) {
+        c = (char) ('A' + remainder);
+      } else {
+        c = (char) ('A' + multiple - 1);
+      }
+      cellRange.append(c);
+      colIndex = remainder;
+    }
+    return new ColRow(cellRange.toString(), rowIndex + 1 + "");
+  }
+
   public static void replaceAllInTable(OdfTable table, PlaceholderProcessor processor) {
     int repetitions = 0;
     boolean madeDuplicate = false;
@@ -32,12 +51,11 @@ public class Replacer {
               (madeDuplicate ? "(...)" : "") + (repeated ? "(REPEATED)" : "") + replacement);
 
           if (repeated && madeDuplicate && replacement instanceof Replacement.None) {
-            cell.getTable().removeRowsByIndex(cell.getRowIndex(), 1);
+            table.removeRowsByIndex(cell.getRowIndex(), 1);
             madeDuplicate = false;
             break;
           } else if (repeated) {
-            var newRowReference =
-                cell.getTable().insertRowsBefore(cell.getRowIndex() + 1, 1).get(0);
+            var newRowReference = table.insertRowsBefore(cell.getRowIndex() + 1, 1).get(0);
             var newRow = newRowReference.getOdfElement();
             NodeList children = newRow.getChildNodes();
             for (int i = children.getLength() - 1; i >= 0; i--) {
@@ -64,6 +82,14 @@ public class Replacer {
             cell.setDisplayText(text.value());
           } else if (replacement instanceof Replacement.Number number) {
             cell.setDoubleValue(number.value());
+          } else if (replacement instanceof Replacement.Formula formula) {
+            var cellAddress = getAbsoluteCellAddress(cell.getColumnIndex(), cell.getRowIndex());
+            cell.setStringValue(null);
+            cell.setFormula(
+                formula
+                    .value()
+                    .replaceAll(Pattern.quote("${{ROW}}"), cellAddress.row)
+                    .replaceAll(Pattern.quote("${{COL}}"), cellAddress.col));
           }
 
           NodePrinter.prettyPrint(cell.getOdfElement());
@@ -80,4 +106,6 @@ public class Replacer {
   public interface PlaceholderProcessor {
     Replacement apply(@NotNull String placeholder, int index);
   }
+
+  record ColRow(String col, String row) {}
 }

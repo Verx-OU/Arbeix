@@ -11,6 +11,11 @@ public sealed interface Replacement {
     public Text {}
   }
 
+  record Formula(String value) implements Replacement {
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public Formula {}
+  }
+
   record Number(double value) implements Replacement {
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public Number {}

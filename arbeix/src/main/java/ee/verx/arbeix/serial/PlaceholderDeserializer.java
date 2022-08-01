@@ -20,6 +20,7 @@ public class PlaceholderDeserializer
   private static final TypeReference<Replacement.Number> NUMBER_REF = new TypeReference<>() {};
   private static final TypeReference<Replacement.Email> EMAIL_REF = new TypeReference<>() {};
   private static final TypeReference<Replacement.Date> DATE_REF = new TypeReference<>() {};
+  private static final TypeReference<Replacement.Formula> FORMULA_REF = new TypeReference<>() {};
 
   @Override
   public HashMap<Placeholder, ArrayList<Replacement>> deserialize(
@@ -37,6 +38,7 @@ public class PlaceholderDeserializer
                     case NUMBER -> NUMBER_REF;
                     case EMAIL -> EMAIL_REF;
                     case DATE -> DATE_REF;
+                    case FORMULA -> FORMULA_REF;
                   };
               var replacements = new ArrayList<Replacement>();
               map.put(key, replacements);
