@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    if: never
+    if: ${{ false }}
 
     runs-on: ${{ matrix.os }}
 
