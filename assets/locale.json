@@ -1,0 +1,30 @@
+{
+  "en": {
+    "tabHome": "Home",
+    "tabTest": "Test",
+    "tabList": "Project",
+    "tabDir": "Dir",
+    "goToHome": "Home",
+    "back": "Back",
+    "dirHeader": "Product selection",
+    "dirPrefix": "Category: ",
+    "dirProduct": "Product: ",
+    "addProduct": "Add product",
+    "listName": "Name",
+    "listUnit": "Unit",
+    "listPrice": "Price"
+  },
+  "ee": {
+    "tabHome": "Kodu",
+    "tabList": "Projekt",
+    "goToHome": "Koju",
+    "back": "Tagasi",
+    "dirHeader": "Tootevalik",
+    "dirPrefix": "Kategooria: ",
+    "dirProduct": "Toode: ",
+    "addProduct": "Lisa toode",
+    "listName": "Nimi",
+    "listUnit": "Ühik",
+    "listPrice": "Hind"
+  }
+}

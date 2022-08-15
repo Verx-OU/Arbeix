@@ -1,0 +1,90 @@
+@import "~normalize.css";
+@import "~@blueprintjs/core/lib/css/blueprint.css";
+@import "~@blueprintjs/popover2/lib/css/blueprint-popover2.css";
+
+:root {
+  --gradient-1: #ffeec5;
+  --gradient-2: #f8c3af;
+  --gradient-3: #e99a9a;
+  --gradient-4: #d37387;
+  --gradient-5: #b55076;
+  --gradient-6: #8f3467;
+  --gradient-7: #5c255c;
+}
+
+@font-face {
+  font-family: BebasKai;
+  src: url(../../assets/BebasKai.otf);
+}
+
+@font-face {
+  font-family: Andika;
+  src: url(../../assets/AndikaNewBasic-Custom-R.ttf);
+}
+
+body {
+  position: relative;
+  background-color: #171717;
+  height: 100vh;
+  padding: -5px;
+  font-family: Andika, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#root {
+  display: grid;
+  grid-template-rows: min-content auto;
+  grid-template-columns: 100vw;
+  justify-content: center;
+  justify-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+#content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  grid-row: 2;
+  overflow-y: hidden;
+}
+
+div.inner-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.clicky {
+  cursor: pointer;
+  transition: 100ms transform, 100ms filter;
+}
+
+.clicky:hover {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+.clicky:active {
+  transform: scale(0.98);
+  filter: brightness(0.9);
+}
+
+.hover-pointer {
+  cursor: pointer;
+}

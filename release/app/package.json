@@ -1,0 +1,13 @@
+{
+  "name": "arbeix",
+  "version": "0.0.1",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "./dist/main/main.js",
+  "scripts": {
+    "electron-rebuild": "node -r ts-node/register ../../scripts/electron-rebuild.js",
+    "postinstall": "npm run electron-rebuild && npm run link-modules",
+    "link-modules": "node -r ts-node/register ../../scripts/link-modules.ts"
+  },
+  "dependencies": {}
+}
