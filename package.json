@@ -17,20 +17,6 @@
     "start:preload": "NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./configs/webpack.config.preload.dev.ts",
     "start:renderer": "NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./configs/webpack.config.renderer.dev.ts"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "NODE_ENV=development eslint --cache"
-    ],
-    "*.json,.{eslintrc,prettierrc}": [
-      "prettier --ignore-path .eslintignore --parser json --write"
-    ],
-    "*.{css,scss}": [
-      "prettier --ignore-path .eslintignore --single-quote --write"
-    ],
-    "*.{html,md,yml}": [
-      "prettier --ignore-path .eslintignore --single-quote --write"
-    ]
-  },
   "dependencies": {
     "@blueprintjs/core": "^4.7.0",
     "@blueprintjs/popover2": "^1.5.1",
@@ -60,7 +46,7 @@
     "core-js": "^3.22.5",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
-    "electron": "^18.2.3",
+    "electron": "^20.0.0",
     "electron-builder": "^23.0.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
@@ -78,7 +64,6 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
-    "lint-staged": "^12.4.1",
     "mini-css-extract-plugin": "^2.6.0",
     "prettier": "^2.6.2",
     "react-refresh": "^0.13.0",
