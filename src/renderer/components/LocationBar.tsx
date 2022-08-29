@@ -12,6 +12,7 @@ export default function LocationBar(props: React.PropsWithChildren) {
     ["/test", lang.tabTest],
     ["/list", lang.tabList],
     ["/dir", lang.tabDir],
+    ["/debug", lang.tabDebug],
   ] as [string, string][];
 
   return (

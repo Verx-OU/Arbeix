@@ -17,6 +17,7 @@ import Splash from "./components/Splash";
 import { maybeParseJSON, useSerialState } from "./serial";
 import { DatasetProduct, ProductTree } from "common/products";
 import Listing from "./components/Listing";
+import Debug from "./components/Debug";
 
 const LISTING_KEY = "app.listing";
 
@@ -78,6 +79,7 @@ const Content = () => {
             />
           }
         />
+        <Route path="debug" element={<Debug />} />
       </Routes>
     </LocationBar>
   );

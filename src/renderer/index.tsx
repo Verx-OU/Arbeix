@@ -12,6 +12,11 @@ const container = document.getElementById("root")!;
 const root = createRoot(container);
 root.render(<App />);
 
+window.electron.ipcRenderer.on("cross-log", (msg) => {
+  window.dispatchEvent(new CustomEvent("cross-log", { detail: msg }));
+  console.log(msg);
+});
+
 window.electron.ipcRenderer.on("change-language", () => {
   const locales = [...Object.keys(locale)];
   const currentIndex = locales.indexOf(globalThis.lang.getLanguage()) ?? 0;
@@ -22,3 +27,9 @@ window.electron.ipcRenderer.on("change-language", () => {
   globalThis.lang.setLanguage(newLocale);
   window.dispatchEvent(new Event("set-locale"));
 });
+
+(window.electron.ipcRenderer.invoke("platform") as Promise<string>)
+  .then((platform: string) => window.localStorage.setItem("platform", platform))
+  .catch((e) => {
+    throw e;
+  });

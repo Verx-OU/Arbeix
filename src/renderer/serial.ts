@@ -27,3 +27,20 @@ export function useSerialState<Key, S>(key: StringLiteral<Key>, defaultState: S)
   };
   return [state, setState];
 }
+
+export function useSessionState<Key, S>(key: StringLiteral<Key>, defaultState: S): [S, SetStatePromise<S>] {
+  const [state, setStateDirect] = useState<S>(() => tryParseJSON(sessionStorage.getItem(key), defaultState));
+  const promise = useMemo(
+    () =>
+      new Promise<S>((resolve) => {
+        sessionStorage.setItem(key, JSON.stringify(state));
+        resolve(state);
+      }),
+    [key, state]
+  );
+  const setState = (stateAction: SetStateAction<S>) => {
+    setStateDirect(stateAction);
+    return promise;
+  };
+  return [state, setState];
+}
