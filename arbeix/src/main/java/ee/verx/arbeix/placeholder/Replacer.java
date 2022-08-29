@@ -47,10 +47,11 @@ public class Replacer {
           out.println(content);
           var repeated = !matcher.group(1).isEmpty();
           var replacement = processor.apply(matcher.group(2), repetitions);
+          boolean noReplacement = (replacement == null) || (replacement instanceof Replacement.None);
           out.println(
               (madeDuplicate ? "(...)" : "") + (repeated ? "(REPEATED)" : "") + replacement);
 
-          if (repeated && madeDuplicate && replacement instanceof Replacement.None) {
+          if (repeated && noReplacement) {
             table.removeRowsByIndex(cell.getRowIndex(), 1);
             madeDuplicate = false;
             break;
@@ -90,6 +91,8 @@ public class Replacer {
                     .value()
                     .replaceAll(Pattern.quote("${{ROW}}"), cellAddress.row)
                     .replaceAll(Pattern.quote("${{COL}}"), cellAddress.col));
+          } else {
+            cell.setDisplayText(null);
           }
 
           NodePrinter.prettyPrint(cell.getOdfElement());
