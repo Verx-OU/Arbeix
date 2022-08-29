@@ -2,15 +2,11 @@ import { FocusStyleManager } from "@blueprintjs/core";
 import { createRoot } from "react-dom/client";
 import { locale } from "./locale";
 import App from "./App";
-import { readDataset } from "./products";
+import { updateLocalProducts } from "./products";
 
 FocusStyleManager.onlyShowFocusOnTabs();
 
-window.sessionStorage.removeItem("products");
-readDataset()
-  .then((i) => window.sessionStorage.setItem("products", JSON.stringify(i)))
-  .then(() => window.dispatchEvent(new Event("set-products")))
-  .catch((err) => console.error(err));
+updateLocalProducts();
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);

@@ -51,3 +51,7 @@
 #dir-navbar li, #dir-navbar .bp4-breadcrumb {
   font-size: 1.8rem;
 }
+
+#dir-navbar .right {
+  margin-left: auto;
+}

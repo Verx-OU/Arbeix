@@ -5,6 +5,7 @@ import { DatasetProduct, ProductTree } from "common/products";
 import { Dispatch, SetStateAction } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
 import { useNavigate } from "react-router-dom";
+import { updateLocalProducts } from "renderer/products";
 
 const DIR_KEY = "dir.path";
 
@@ -54,6 +55,14 @@ function DirBar({ path, setPath }: DirBarProps) {
   return (
     <div id="dir-navbar" className="top-bar">
       <Breadcrumbs2 items={breadcrumbs} />
+      {breadcrumbs.length === 1 && (
+        <Button
+          intent="danger"
+          text={lang.dirReload}
+          className="right"
+          onClick={() => updateLocalProducts()}
+        />
+      )}
     </div>
   );
 }
