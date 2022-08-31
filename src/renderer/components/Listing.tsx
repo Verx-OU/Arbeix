@@ -1,5 +1,5 @@
 import { HTMLTable } from "@blueprintjs/core";
-import { DatasetProduct } from "common/products";
+import { DatasetProduct } from "types/products";
 
 interface ListingProps {
   listing: DatasetProduct[];

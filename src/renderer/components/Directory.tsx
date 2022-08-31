@@ -1,7 +1,7 @@
 import { BreadcrumbProps, Button, H2, NonIdealState, Spinner, SpinnerSize } from "@blueprintjs/core";
 import "./Directory.css";
 import { SetStatePromise, useSerialState } from "../serial";
-import { DatasetProduct, ProductTree } from "common/products";
+import { DatasetProduct, ProductTree } from "types/products";
 import { Dispatch, SetStateAction } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
 import { useNavigate } from "react-router-dom";
