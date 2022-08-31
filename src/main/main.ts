@@ -18,8 +18,8 @@ import MenuBuilder from "./menu";
 import { resolveHtmlPath } from "./util";
 import { mkdirSync, promises } from "fs";
 import { parse } from "papaparse";
-import { DatasetProduct, ProductTree } from "common/products";
-const spawn = require("child_process").spawn;
+import { odsExample } from "./ods";
+import { DatasetProduct, ProductTree } from "types/products";
 
 const appName = "Arbeix";
 app.setName(appName);
@@ -82,29 +82,14 @@ ipcMain.handle("platform", async () => {
   return process.platform;
 });
 
-ipcMain.handle("proc", async (_event, fileName, template, content) => {
-  console.log(fileName);
+ipcMain.handle("proc", async (_event, template, sheet, schema) => {
   console.log(template);
+  console.log(sheet);
+  console.log(schema);
 
-  console.log(content);
-  const tempPath = app.getPath("temp");
-  const fullPath = `${tempPath}/arbeix-${Date.now()}`;
-  await promises.writeFile(fullPath, content, { encoding: "utf-8", flag: "w" });
-  console.log(fullPath);
-
-  const bat = spawn(fileName, [template, fullPath]);
-
-  bat.stdout.on("data", (data: unknown) => {
-    mainWindow?.webContents.send("cross-log", `[STDOUT] ${data}`);
-  });
-
-  bat.stderr.on("data", (err: unknown) => {
-    mainWindow?.webContents.send("cross-log", `[STDERR] ${err}`);
-  });
-
-  bat.on("exit", (code: unknown) => {
-    mainWindow?.webContents.send("cross-log", `[EXIT] ${code}`);
-  });
+  const result = await odsExample(template, sheet, schema);
+  console.log(result);
+  shell.showItemInFolder(result);
 });
 
 if (process.env.NODE_ENV === "production") {

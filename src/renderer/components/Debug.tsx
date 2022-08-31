@@ -1,21 +1,13 @@
-import { Button, ButtonGroup, ControlGroup, FileInput, InputGroup, Pre } from "@blueprintjs/core";
-import { useEffect } from "react";
-import { SetStatePromise, useSerialState, useSessionState } from "renderer/serial";
-
-type Replacements = Record<string, string>;
+import { Button, ButtonGroup, ControlGroup, FileInput, InputGroup } from "@blueprintjs/core";
+import { join } from "path";
+import { SetStatePromise, useSerialState } from "renderer/serial";
+import { AggregateReplacement, EmailReplacement, Schema } from "types/ods";
 
 export default function Debug() {
-  const [procPath, setProcPath] = useSerialState("debug.proc.proc", "");
   const [templatePath, setTemplatePath] = useSerialState("debug.proc.template", "");
-  const [logHistory, setLogHistory] = useSessionState("debug.proc.log", [] as [number, string][]);
-  const [replacements, setReplacements] = useSerialState("debug.proc.replace", {} as Replacements);
-
-  useEffect(() => {
-    const addLine = (event: Event) =>
-      setLogHistory((i) => [...i, [Date.now() + i.length, (event as CustomEvent<string>).detail]]);
-    window.addEventListener("cross-log", addLine);
-    return () => window.removeEventListener("cross-log", addLine);
-  }, [setLogHistory]);
+  const [sheet, setSheet] = useSerialState("debug.proc.sheet", "");
+  const [schema, setSchema] = useSerialState("debug.proc.schema", {} as Schema);
+  const products = (schema["M"] ?? []) as AggregateReplacement;
 
   const FileInputWrapper = (props: { state: string; setState: SetStatePromise<string>; default: string }) => {
     return (
@@ -28,49 +20,79 @@ export default function Debug() {
   };
 
   return (
-    <div id="debug" className="inner-content">
-      <ControlGroup vertical>
-        <FileInputWrapper default="proc" state={procPath} setState={setProcPath} />
-        <FileInputWrapper default="template" state={templatePath} setState={setTemplatePath} />
-        {["CL_TEL", "CL_NAME", "CL_OBJ", "NR", "CL_COMPANY", "CL_MAIL"].map((i) => (
-          <InputGroup
-            key={i}
-            defaultValue={replacements[i]!}
-            placeholder={i}
-            onChange={(event) => setReplacements((j) => ({ ...j, [i]: event.target.value }))}
-          />
+    <div
+      id="debug"
+      className="inner-content"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      <FileInputWrapper default="template" state={templatePath} setState={setTemplatePath} />
+      <InputGroup defaultValue={sheet} onChange={(event) => setSheet(event.target.value)} />
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <div>
+          <ControlGroup vertical>
+            {["HINNAPAKKUMINE_NR", "KLIENT_NIMI", "KLIENT_ETTEVOTE", "KLIENT_TELEFON", "KLIENT_OBJEKT"].map(
+              (i) => (
+                <InputGroup
+                  key={i}
+                  defaultValue={schema[i] as string}
+                  placeholder={i}
+                  onChange={(event) => setSchema((j) => ({ ...j, [i]: event.target.value }))}
+                />
+              )
+            )}
+            <InputGroup
+              defaultValue={(schema["KLIENT_EKIRI"] as EmailReplacement)?.email}
+              placeholder="KLIENT_EKIRI"
+              onChange={(event) => setSchema((j) => ({ ...j, KLIENT_EKIRI: { email: event.target.value } }))}
+            />
+          </ControlGroup>
+        </div>
+        {products.map((i, j) => (
+          <ControlGroup vertical key={j}>
+            {["NIMI", "MU", "MAHT", "HIND", "KASUM", "MUUA"].map((k) => (
+              <InputGroup
+                key={k}
+                defaultValue={i[k] as string}
+                placeholder={`M:${k} (${j})`}
+                onChange={(event) =>
+                  setSchema((x) => {
+                    (x["M"] as AggregateReplacement)[j] = {
+                      ...i,
+                      [k]: ["MAHT", "HIND", "KASUM"].includes(k)
+                        ? parseInt(event.target.value)
+                        : event.target.value,
+                    };
+                    return { ...x };
+                  })
+                }
+              />
+            ))}
+          </ControlGroup>
         ))}
-        <ButtonGroup fill>
-          <Button
-            intent="warning"
-            icon="double-chevron-right"
-            onClick={() => {
-              setLogHistory([]);
-              window.electron.ipcRenderer.invoke(
-                "proc",
-                procPath,
-                templatePath,
-                JSON.stringify(replacements)
-              );
-            }}
-          />
-          <Button
-            intent="danger"
-            icon="trash"
-            onClick={() => {
-              setLogHistory([]);
-            }}
-          />
-        </ButtonGroup>
-      </ControlGroup>
-
-      <hr />
-
-      {logHistory.map(([j, i]) => (
-        <Pre style={{ padding: 0, margin: 0 }} key={j}>
-          {i}
-        </Pre>
-      ))}
+      </div>
+      <ButtonGroup>
+        <Button
+          intent="warning"
+          icon="double-chevron-right"
+          onClick={() => {
+            window.electron.ipcRenderer.invoke("proc", templatePath, sheet, schema);
+          }}
+        />
+        <Button
+          intent="success"
+          icon="plus"
+          onClick={() => {
+            setSchema((j) => ({ ...j, M: [...(schema["M"] as AggregateReplacement), {}] }));
+          }}
+        />
+        <Button
+          intent="danger"
+          icon="trash"
+          onClick={() => {
+            setSchema((j) => ({ ...j, M: [] }));
+          }}
+        />
+      </ButtonGroup>
     </div>
   );
 }
