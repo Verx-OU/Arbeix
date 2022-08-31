@@ -1,1 +1,1 @@
-# Arbeix (monorepo)
+# Arbeix
