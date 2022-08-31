@@ -15,7 +15,7 @@ import { DEFAULT_LOCALE } from "./locale";
 import LocationBar from "./components/LocationBar";
 import Splash from "./components/Splash";
 import { maybeParseJSON, useSerialState } from "./serial";
-import { DatasetProduct, ProductTree } from "common/products";
+import { DatasetProduct, ProductTree } from "types/products";
 import Listing from "./components/Listing";
 import Debug from "./components/Debug";
 

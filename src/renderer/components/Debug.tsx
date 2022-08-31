@@ -1,5 +1,4 @@
 import { Button, ButtonGroup, ControlGroup, FileInput, InputGroup } from "@blueprintjs/core";
-import { join } from "path";
 import { SetStatePromise, useSerialState } from "renderer/serial";
 import { AggregateReplacement, EmailReplacement, Schema } from "types/ods";
 
