@@ -7,8 +7,6 @@ on:
 
 jobs:
   publish:
-    if: ${{ false }}
-
     runs-on: ${{ matrix.os }}
 
     strategy:
