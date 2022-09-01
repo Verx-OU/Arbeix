@@ -1,8 +1,9 @@
 {
   "name": "arbeix",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "UNLICENSED",
   "private": true,
+  "author": "rymiel",
   "main": "./src/main/main.ts",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -47,8 +48,8 @@
     "core-js": "^3.25.0",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
-    "electron": "^20.0.0",
-    "electron-builder": "^23.0.3",
+    "electron": "npm:electron-nightly@22.0.0-nightly.20220812",
+    "electron-builder": "^23.5.0",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
     "electron-rebuild": "^3.2.7",
@@ -128,8 +129,7 @@
     "linux": {
       "target": [
         "AppImage"
-      ],
-      "category": "Development"
+      ]
     },
     "directories": {
       "app": "release/app",
@@ -149,11 +149,8 @@
     "node": ">=17.x",
     "npm": ">=7.x"
   },
-  "electronmon": {
-    "patterns": [
-      "!**/**",
-      "src/main/*"
-    ],
-    "logLevel": "quiet"
-  }
+  "os": [
+    "darwin",
+    "linux"
+  ]
 }

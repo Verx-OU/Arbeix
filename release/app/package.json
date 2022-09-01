@@ -4,6 +4,11 @@
   "license": "UNLICENSED",
   "private": true,
   "main": "./dist/main/main.js",
+  "author": "rymiel",
+  "os": [
+    "darwin",
+    "linux"
+  ],
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../scripts/electron-rebuild.js",
     "postinstall": "npm run electron-rebuild && npm run link-modules",
