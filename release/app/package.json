@@ -1,10 +1,10 @@
 {
   "name": "arbeix",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "UNLICENSED",
   "private": true,
   "main": "./dist/main/main.js",
-  "author": "rymiel",
+  "author": "Verx",
   "os": [
     "darwin",
     "linux"
