@@ -39,7 +39,7 @@ const configuration: webpack.Configuration = {
   module: {
     rules: [
       {
-        test: /\.s?(a|c)ss$/,
+        test: /\.s?css$/,
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -50,13 +50,12 @@ const configuration: webpack.Configuration = {
               importLoaders: 1,
             },
           },
-          "sass-loader",
         ],
         include: /\.module\.s?(c|a)ss$/,
       },
       {
-        test: /\.s?(a|c)ss$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+        test: /\.s?css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
         exclude: /\.module\.s?(c|a)ss$/,
       },
       // Fonts
@@ -103,6 +102,7 @@ const configuration: webpack.Configuration = {
 
     new BundleAnalyzerPlugin({
       analyzerMode: process.env.ANALYZE === "true" ? "server" : "disabled",
+      analyzerPort: 8883,
     }),
 
     new HtmlWebpackPlugin({

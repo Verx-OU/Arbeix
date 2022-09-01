@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import webpack from "webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import chalk from "chalk";
 import { merge } from "webpack-merge";
 import { execSync, spawn } from "child_process";
 import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
@@ -26,11 +25,7 @@ const requiredByDLLConfig = module.parent!.filename.includes("webpack.config.ren
  * Warn if the DLL is not built
  */
 if (!requiredByDLLConfig && !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))) {
-  console.log(
-    chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
-    )
-  );
+  console.log('The DLL files are missing. Sit back while we build them for you with "npm run build-dll"');
   execSync("npm run postinstall");
 }
 
@@ -70,13 +65,12 @@ const configuration: webpack.Configuration = {
               importLoaders: 1,
             },
           },
-          "sass-loader",
         ],
         include: /\.module\.s?(c|a)ss$/,
       },
       {
         test: /\.s?css$/,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: ["style-loader", "css-loader"],
         exclude: /\.module\.s?(c|a)ss$/,
       },
       // Fonts
