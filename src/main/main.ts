@@ -12,8 +12,8 @@ import "core-js/actual/structured-clone";
 
 import path from "path";
 import { app, BrowserWindow, shell, ipcMain } from "electron";
-import { autoUpdater } from "electron-updater";
-import log from "electron-log";
+// import { autoUpdater } from "electron-updater";
+// import log from "electron-log";
 import MenuBuilder from "./menu";
 import { resolveHtmlPath } from "./util";
 import { mkdirSync, promises } from "fs";
@@ -27,13 +27,13 @@ const appData = app.getPath("appData");
 mkdirSync(path.join(appData, appName), { recursive: true });
 app.setPath("userData", path.join(appData, appName));
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = "info";
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+// class AppUpdater {
+//   constructor() {
+//     log.transports.file.level = "info";
+//     autoUpdater.logger = log;
+//     autoUpdater.checkForUpdatesAndNotify();
+//   }
+// }
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -167,9 +167,7 @@ const createWindow = async () => {
     return { action: "deny" };
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**
