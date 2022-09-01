@@ -14,7 +14,7 @@
     "package": "ts-node ./scripts/clean.js dist && npm run build && electron-builder build --publish never",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "npm run start:renderer",
-    "start:main": "NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
+    "start:main": "NODE_ENV=development electron -r ts-node/register/transpile-only .",
     "start:preload": "NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./configs/webpack.config.preload.dev.ts",
     "start:renderer": "NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./configs/webpack.config.renderer.dev.ts"
   },
@@ -53,7 +53,6 @@
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",
     "electron-rebuild": "^3.2.7",
-    "electronmon": "^2.0.2",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-typescript": "^2.7.1",
