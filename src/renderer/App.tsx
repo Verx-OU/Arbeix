@@ -1,14 +1,5 @@
-import { Button, H1 } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import {
-  MemoryRouter as Router,
-  Routes,
-  Route,
-  Link,
-  Navigate,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { MemoryRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 import Directory from "./components/Directory";
 import { DEFAULT_LOCALE } from "./locale";
@@ -20,15 +11,6 @@ import Listing from "./components/Listing";
 import Debug from "./components/Debug";
 
 const LISTING_KEY = "app.listing";
-
-const Test = () => (
-  <div className="inner-content">
-    <H1>Test</H1>
-    <Link to="/">
-      <Button>{lang.goToHome}</Button>
-    </Link>
-  </div>
-);
 
 const Content = () => {
   const navigate = useNavigate();
@@ -68,7 +50,6 @@ const Content = () => {
         />
         <Route path="/" element={<Navigate to="/splash" />} />
         <Route path="splash" element={<Splash />} />
-        <Route path="test" element={<Test />} />
         <Route path="list" element={<Listing listing={listing} />} />
         <Route
           path="dir"
