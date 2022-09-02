@@ -18,6 +18,11 @@
   transition: 100ms all;
 }
 
+.top-bar .option.ephemeral {
+  color: #99f;
+  font-style: italic;
+}
+
 .top-bar .option a {
   margin: 10px;
 }

@@ -11,6 +11,7 @@ import Listing from "./components/Listing";
 import Debug from "./components/Debug";
 
 const LISTING_KEY = "app.listing";
+const SELECTING_PRODUCT_KEY = "app.selectingproduct";
 
 const Content = () => {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ const Content = () => {
 
   const [products, setProducts] = useState(maybeParseJSON<ProductTree>(sessionStorage.getItem("products")));
   const [listing, setListing] = useSerialState(LISTING_KEY, [] as DatasetProduct[]);
+  const [selectingProduct, setSelectingProduct] = useSerialState(SELECTING_PRODUCT_KEY, false);
+  const disabledRoutes = [];
+  if (!selectingProduct) disabledRoutes.push("/dir");
 
   useEffect(() => {
     const checkUserData = () => setProducts(maybeParseJSON(sessionStorage.getItem("products")));
@@ -35,7 +39,7 @@ const Content = () => {
   }, []);
 
   return (
-    <LocationBar>
+    <LocationBar disabledRoutes={disabledRoutes}>
       <Routes>
         <Route
           path="/init"
@@ -50,13 +54,28 @@ const Content = () => {
         />
         <Route path="/" element={<Navigate to="/splash" />} />
         <Route path="splash" element={<Splash />} />
-        <Route path="list" element={<Listing listing={listing} />} />
+        <Route
+          path="list"
+          element={
+            <Listing
+              listing={listing}
+              goSelectProduct={() => {
+                setSelectingProduct(true);
+                navigate("dir");
+              }}
+            />
+          }
+        />
         <Route
           path="dir"
           element={
             <Directory
               products={products}
-              addToListing={(product) => setListing((list) => [...list, product])}
+              addToListing={(product) => {
+                setSelectingProduct(false);
+                setListing((list) => [...list, product]);
+                navigate("list");
+              }}
             />
           }
         />

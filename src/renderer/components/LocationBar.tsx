@@ -2,26 +2,38 @@ import { Tab, Tabs } from "@blueprintjs/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./LocationBar.css";
 
-export default function LocationBar(props: React.PropsWithChildren) {
+interface LocationBarProps {
+  disabledRoutes: string[];
+}
+
+export default function LocationBar(props: React.PropsWithChildren<LocationBarProps>) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { children } = props;
+  const { disabledRoutes, children } = props;
 
   const LOCATIONS = [
-    ["/splash", lang.tabHome],
-    ["/test", lang.tabTest],
-    ["/list", lang.tabList],
-    ["/dir", lang.tabDir],
-    ["/debug", lang.tabDebug],
-  ] as [string, string][];
+    ["/splash", lang.tabHome, false],
+    ["/debug", lang.tabDebug, false],
+    ["/list", lang.tabList, false],
+    ["/dir", lang.tabDir, true],
+  ] as [string, string, boolean][];
 
   return (
     <>
       <div id="location" className="top-bar">
         <Tabs large selectedTabId={location.pathname} onChange={(newTab) => navigate(newTab as string)}>
-          {LOCATIONS.map(([link, name]) => {
-            return <Tab key={link} title={<a>{name}</a>} id={link} className="option"></Tab>;
-          })}
+          {LOCATIONS.filter(([link]) => link === location.pathname || !disabledRoutes.includes(link)).map(
+            ([link, name, ephemeral]) => {
+              return (
+                <Tab
+                  key={link}
+                  title={<a>{name}</a>}
+                  id={link}
+                  className={`option${ephemeral ? " ephemeral" : ""}`}
+                ></Tab>
+              );
+            }
+          )}
         </Tabs>
       </div>
       <div id="content" data-route={location.pathname}>
