@@ -81,7 +81,7 @@ export default function Debug() {
           intent="success"
           icon="plus"
           onClick={() => {
-            setSchema((j) => ({ ...j, M: [...(schema["M"] as AggregateReplacement), {}] }));
+            setSchema((j) => ({ ...j, M: [...((schema["M"] as AggregateReplacement) ?? []), {}] }));
           }}
         />
         <Button
