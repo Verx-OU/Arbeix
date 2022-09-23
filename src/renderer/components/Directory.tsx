@@ -1,6 +1,6 @@
 import { BreadcrumbProps, Button, H2, NonIdealState, Spinner, SpinnerSize } from "@blueprintjs/core";
 import "./Directory.css";
-import { SetStatePromise, useSerialState } from "../serial";
+import { SetState, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
 import { Dispatch, SetStateAction } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
@@ -69,7 +69,7 @@ function DirBar({ path, setPath }: DirBarProps) {
 
 interface ConfirmProductProps {
   product: DatasetProduct;
-  setPath: SetStatePromise<Path>;
+  setPath: SetState<Path>;
   addToListing: (product: DatasetProduct) => void;
 }
 function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps) {
@@ -84,7 +84,7 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
           large
           icon="tick"
           onClick={async () => {
-            await setPath(pathReset());
+            setPath(pathReset());
             addToListing(product);
             navigate("/list");
           }}

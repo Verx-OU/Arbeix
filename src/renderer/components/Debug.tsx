@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, ControlGroup, FileInput, InputGroup } from "@blueprintjs/core";
-import { SetStatePromise, useSerialState } from "renderer/serial";
+import { SetState, useSerialState } from "renderer/serial";
 import { AggregateReplacement, EmailReplacement, Schema } from "types/ods";
 
 export default function Debug() {
@@ -8,7 +8,7 @@ export default function Debug() {
   const [schema, setSchema] = useSerialState("debug.proc.schema", {} as Schema);
   const products = (schema["M"] ?? []) as AggregateReplacement;
 
-  const FileInputWrapper = (props: { state: string; setState: SetStatePromise<string>; default: string }) => {
+  const FileInputWrapper = (props: { state: string; setState: SetState<string>; default: string }) => {
     return (
       <FileInput
         text={props.state === "" ? props.default : props.state}
