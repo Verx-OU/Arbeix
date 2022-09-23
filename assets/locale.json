@@ -14,7 +14,8 @@
     "addProduct": "Add product",
     "listName": "Name",
     "listUnit": "Unit",
-    "listPrice": "Price"
+    "listPrice": "Price",
+    "manageProducts": "Manage products"
   },
   "ee": {
     "tabHome": "Kodu",
@@ -29,6 +30,7 @@
     "addProduct": "Lisa toode",
     "listName": "Nimi",
     "listUnit": "Ühik",
-    "listPrice": "Hind"
+    "listPrice": "Hind",
+    "manageProducts": "Halda tooteid"
   }
 }

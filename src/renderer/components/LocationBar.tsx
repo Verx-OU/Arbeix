@@ -36,7 +36,7 @@ export default function LocationBar(props: React.PropsWithChildren<LocationBarPr
           )}
         </Tabs>
       </div>
-      <div id="content" data-route={location.pathname}>
+      <div id="content" data-route={location.pathname} key={location.pathname}>
         {children}
       </div>
     </>

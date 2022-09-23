@@ -19,6 +19,7 @@ export const LOCALE_KEYS = [
   "listName",
   "listUnit",
   "listPrice",
+  "manageProducts",
 ] as const;
 type LocaleKeys = Record<typeof LOCALE_KEYS[number], string>;
 export interface IStrings extends LocaleKeys, LocalizedStringsMethods {}

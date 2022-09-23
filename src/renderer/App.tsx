@@ -79,6 +79,18 @@ const Content = () => {
             />
           }
         />
+        <Route
+          path="manage/products"
+          element={
+            <Directory
+              products={products}
+              addToListing={(product) => {
+                setSelectingProduct(false);
+                navigate("splash");
+              }}
+            />
+          }
+        />
         <Route path="debug" element={<Debug />} />
       </Routes>
     </LocationBar>
