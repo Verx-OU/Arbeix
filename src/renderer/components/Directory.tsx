@@ -105,8 +105,8 @@ export interface DirectoryProps {
   products: ProductTree | null;
   addToListing: (product: DatasetProduct) => void;
 }
-export default function Directory({ products, addToListing }: DirectoryProps) {
-  const [path, setPath] = useSerialState(DIR_KEY, pathReset());
+export default function Directory({ products, addToListing }: DirectoryProps): JSX.Element {
+  const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
 
   const hasData = products !== null;
 

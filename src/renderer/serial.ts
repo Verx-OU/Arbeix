@@ -1,4 +1,5 @@
-import { useState, SetStateAction, useMemo } from "react";
+import React, { useState, SetStateAction, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 
 export function tryParseJSON<T>(string: string | null, def: T): T {
   return string === null ? def : (JSON.parse(string) as T);
@@ -11,15 +12,24 @@ export function maybeParseJSON<T>(string: string | null): T | null {
 export type DispatchPromise<A, P> = (value: A) => Promise<P>;
 export type SetStatePromise<A> = DispatchPromise<SetStateAction<A>, A>;
 type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
-export function useSerialState<Key, S>(key: StringLiteral<Key>, defaultState: S): [S, SetStatePromise<S>] {
-  const [state, setStateDirect] = useState<S>(() => tryParseJSON(localStorage.getItem(key), defaultState));
+export function useSerialState<Key, S, E = unknown>(
+  key: StringLiteral<Key>,
+  defaultState: S,
+  element?: React.FC<E>
+): [S, SetStatePromise<S>] {
+  const location = useLocation();
+  const prefix = element ? `${location.pathname}/${element?.displayName ?? element?.name ?? "."}` : `!`;
+  const fullKey = `@${prefix}/${key}`;
+  const [state, setStateDirect] = useState<S>(() =>
+    tryParseJSON(localStorage.getItem(fullKey), defaultState)
+  );
   const promise = useMemo(
     () =>
       new Promise<S>((resolve) => {
-        localStorage.setItem(key, JSON.stringify(state));
+        localStorage.setItem(fullKey, JSON.stringify(state));
         resolve(state);
       }),
-    [key, state]
+    [fullKey, state]
   );
   const setState = (stateAction: SetStateAction<S>) => {
     setStateDirect(stateAction);
@@ -28,15 +38,24 @@ export function useSerialState<Key, S>(key: StringLiteral<Key>, defaultState: S)
   return [state, setState];
 }
 
-export function useSessionState<Key, S>(key: StringLiteral<Key>, defaultState: S): [S, SetStatePromise<S>] {
-  const [state, setStateDirect] = useState<S>(() => tryParseJSON(sessionStorage.getItem(key), defaultState));
+export function useSessionState<Key, S, E = unknown>(
+  key: StringLiteral<Key>,
+  defaultState: S,
+  element?: React.FC<E>
+): [S, SetStatePromise<S>] {
+  const location = useLocation();
+  const prefix = element ? `${location.pathname}/${element?.displayName ?? element?.name ?? "."}` : `!`;
+  const fullKey = `@${prefix}/${key}`;
+  const [state, setStateDirect] = useState<S>(() =>
+    tryParseJSON(sessionStorage.getItem(fullKey), defaultState)
+  );
   const promise = useMemo(
     () =>
       new Promise<S>((resolve) => {
-        sessionStorage.setItem(key, JSON.stringify(state));
+        sessionStorage.setItem(fullKey, JSON.stringify(state));
         resolve(state);
       }),
-    [key, state]
+    [fullKey, state]
   );
   const setState = (stateAction: SetStateAction<S>) => {
     setStateDirect(stateAction);
