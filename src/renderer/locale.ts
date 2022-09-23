@@ -3,25 +3,7 @@ import * as locale from "../../assets/locale.json";
 
 export { locale };
 
-export const LOCALE_KEYS = [
-  "tabHome",
-  "tabTest",
-  "tabDir",
-  "tabList",
-  "tabDebug",
-  "goToHome",
-  "back",
-  "dirHeader",
-  "dirPrefix",
-  "dirProduct",
-  "dirReload",
-  "addProduct",
-  "listName",
-  "listUnit",
-  "listPrice",
-  "manageProducts",
-] as const;
-type LocaleKeys = Record<typeof LOCALE_KEYS[number], string>;
+type LocaleKeys = typeof locale[typeof DEFAULT_LOCALE];
 export interface IStrings extends LocaleKeys, LocalizedStringsMethods {}
 
 export const DEFAULT_LOCALE = "en" as const;
