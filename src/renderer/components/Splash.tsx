@@ -1,6 +1,5 @@
 import { Button, H1 } from "@blueprintjs/core";
 import { Link } from "react-router-dom";
-import icon from "../../../assets/icon.svg";
 import "./Splash.css";
 
 export default function Splash() {
@@ -8,13 +7,12 @@ export default function Splash() {
     <div>
       <div id="splash">
         <div>
-          <img width="200" alt="icon" src={icon} />
           <H1 className="title">Arbeix</H1>
         </div>
         <div className="right-panel">
-          <Button>
-            <Link to="/manage/products">{lang.manageProducts}</Link>
-          </Button>
+          <Link to="/manage/products">
+            <Button large text={lang.manageProducts} intent="success" icon="box" />
+          </Link>
         </div>
       </div>
     </div>
