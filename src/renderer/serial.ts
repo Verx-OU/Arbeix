@@ -22,12 +22,10 @@ export function useSerialState<Key, S, E = unknown>(
   const [state, setStateDirect] = useState<S>(() =>
     tryParseJSON(localStorage.getItem(fullKey), defaultState)
   );
-  console.trace(fullKey, state);
   const setState = (stateAction: SetStateAction<S>) => {
     setStateDirect((value) => {
       const modified = stateAction instanceof Function ? stateAction(value) : stateAction;
       localStorage.setItem(fullKey, JSON.stringify(modified));
-      console.trace(fullKey, modified, element);
       return modified;
     });
   };
