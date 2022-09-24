@@ -1,4 +1,13 @@
-import { BreadcrumbProps, Button, H2, NonIdealState, Spinner, SpinnerSize } from "@blueprintjs/core";
+import {
+  BreadcrumbProps,
+  Button,
+  ButtonGroup,
+  H2,
+  InputGroup,
+  NonIdealState,
+  Spinner,
+  SpinnerSize,
+} from "@blueprintjs/core";
 import "./Directory.css";
 import { SetState, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
@@ -17,6 +26,12 @@ function dig(data: ProductTree, path: string[]): Readonly<ProductTree> {
     ref = ref.categories[i] ?? EMPTY_PRODUCT_TREE;
   }
   return ref;
+}
+
+function totalLeafItems(root: ProductTree): number {
+  return Object.keys(root.categories)
+    .map((i) => root.categories[i]!)
+    .reduce((sum, i) => sum + totalLeafItems(i), root.items.length);
 }
 
 interface Path {
@@ -56,12 +71,10 @@ function DirBar({ path, setPath }: DirBarProps) {
     <div id="dir-navbar" className="top-bar">
       <Breadcrumbs2 items={breadcrumbs} />
       {breadcrumbs.length === 1 && (
-        <Button
-          intent="danger"
-          text={lang.dirReload}
-          className="right"
-          onClick={() => updateLocalProducts()}
-        />
+        <ButtonGroup className="right">
+          <Button intent="success" icon="plus" text={lang.newProduct} />
+          <Button intent="danger" icon="refresh" onClick={() => updateLocalProducts()} />
+        </ButtonGroup>
       )}
     </div>
   );
@@ -70,26 +83,28 @@ function DirBar({ path, setPath }: DirBarProps) {
 interface ConfirmProductProps {
   product: DatasetProduct;
   setPath: SetState<Path>;
-  addToListing: (product: DatasetProduct) => void;
+  addToListing?: (product: DatasetProduct) => void;
 }
 function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps) {
   const navigate = useNavigate();
 
   return (
     <>
-      <div id="dir-navbar" className="top-bar">
-        <Button
-          intent="success"
-          text={lang.addProduct}
-          large
-          icon="tick"
-          onClick={async () => {
-            setPath(pathReset());
-            addToListing(product);
-            navigate("/list");
-          }}
-        />
-      </div>
+      {addToListing && (
+        <div id="dir-navbar" className="top-bar">
+          <Button
+            intent="success"
+            text={lang.addProduct}
+            large
+            icon="tick"
+            onClick={async () => {
+              setPath(pathReset());
+              addToListing(product);
+              navigate(-1);
+            }}
+          />
+        </div>
+      )}
       <div id="directory-product" className="inner-content">
         <H2 title={product.id.toString()}>
           {lang.dirProduct} {product.name}
@@ -101,9 +116,16 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
   );
 }
 
+interface CreateProductProps {
+  addProduct: (product: DatasetProduct) => void;
+}
+function CreateProduct({ addProduct }: CreateProductProps): JSX.Element {
+  return <InputGroup></InputGroup>;
+}
+
 export interface DirectoryProps {
   products: ProductTree | null;
-  addToListing: (product: DatasetProduct) => void;
+  addToListing?: (product: DatasetProduct) => void;
 }
 export default function Directory({ products, addToListing }: DirectoryProps): JSX.Element {
   const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
@@ -121,7 +143,7 @@ export default function Directory({ products, addToListing }: DirectoryProps): J
       itemChoices = treeNode.items.map((i) => i.name);
       catChoices = Object.keys(treeNode.categories).map((key) => [
         key,
-        treeNode.categories[key]!.items.length,
+        totalLeafItems(treeNode.categories[key]!),
       ]);
     }
   }
