@@ -12,12 +12,13 @@ import "core-js/actual/structured-clone";
 
 import path from "path";
 import { app, BrowserWindow, shell, ipcMain } from "electron";
+import { EOL } from "os";
 // import { autoUpdater } from "electron-updater";
 // import log from "electron-log";
 import MenuBuilder from "./menu";
 import { resolveHtmlPath } from "./util";
 import { mkdirSync, promises } from "fs";
-import { parse } from "papaparse";
+import { parse, unparse } from "papaparse";
 import { odsExample } from "./ods";
 import { DatasetProduct, ProductTree } from "types/products";
 
@@ -57,7 +58,8 @@ function dig(data: ProductTree, path: string[]): ProductTree {
 ipcMain.handle("read-user-data", async (_event, fileName) => {
   const path = app.getPath("userData");
   const buf = await promises.readFile(`${path}/${fileName}`, { encoding: "utf-8", flag: "a+" });
-  const data: ProductTree = makeEmptyProductTree();
+  const tree: ProductTree = makeEmptyProductTree();
+  const list: DatasetProduct[] = [];
 
   return new Promise((resolve, reject) => {
     parse<DatasetProduct>(buf.trim(), {
@@ -69,13 +71,21 @@ ipcMain.handle("read-user-data", async (_event, fileName) => {
           reject(results.errors);
         }
         const result = results.data;
-        dig(data, result.category.trim().split("/")).items.push(results.data);
+        dig(tree, result.category.trim().split("/")).items.push(result);
+        list.push(result);
       },
       complete() {
-        setTimeout(() => resolve(data), 1000);
+        resolve([tree, list]);
       },
     });
   });
+});
+
+ipcMain.handle("set-user-data", async (_event, fileName, data: DatasetProduct[]) => {
+  const path = app.getPath("userData");
+
+  const csv = unparse(data, { header: true, newline: EOL });
+  await promises.writeFile(`${path}/${fileName}`, csv, { encoding: "utf-8", flag: "w" });
 });
 
 ipcMain.handle("platform", async () => {

@@ -9,6 +9,7 @@ import { maybeParseJSON, useSerialState } from "./serial";
 import { DatasetProduct, ProductTree } from "types/products";
 import Listing from "./components/Listing";
 import Debug from "./components/Debug";
+import { patchDataset } from "./products";
 
 const LISTING_KEY = "app.listing";
 const SELECTING_PRODUCT_KEY = "app.selectingproduct";
@@ -26,14 +27,18 @@ const Content = () => {
   useEffect(() => navigate(0), [lang, navigate]);
   useEffect(() => localStorage.setItem("lastPage", location.pathname), [location]);
 
-  const [products, setProducts] = useState(maybeParseJSON<ProductTree>(sessionStorage.getItem("products")));
+  const [tree, setTree] = useState(maybeParseJSON<ProductTree>(sessionStorage.getItem("products")));
+  const [list, setList] = useState(maybeParseJSON<DatasetProduct[]>(sessionStorage.getItem("product-list")));
   const [listing, setListing] = useSerialState(LISTING_KEY, [] as DatasetProduct[]);
   const [selectingProduct, setSelectingProduct] = useSerialState(SELECTING_PRODUCT_KEY, false);
   const disabledRoutes = [];
   if (!selectingProduct) disabledRoutes.push("/dir");
 
   useEffect(() => {
-    const checkUserData = () => setProducts(maybeParseJSON(sessionStorage.getItem("products")));
+    const checkUserData = () => {
+      setTree(maybeParseJSON(sessionStorage.getItem("products")));
+      setList(maybeParseJSON(sessionStorage.getItem("product-list")));
+    };
     window.addEventListener("set-products", checkUserData);
     return () => window.removeEventListener("set-products", checkUserData);
   }, []);
@@ -70,7 +75,8 @@ const Content = () => {
           path="dir"
           element={
             <Directory
-              products={products}
+              tree={tree}
+              list={list}
               addToListing={(product) => {
                 setSelectingProduct(false);
                 setListing((list) => [...list, product]);
@@ -82,13 +88,7 @@ const Content = () => {
         <Route
           path="manage/products"
           element={
-            <Directory
-              products={products}
-              addToListing={(product) => {
-                setSelectingProduct(false);
-                navigate("splash");
-              }}
-            />
+            <Directory tree={tree} list={list} addProduct={(product) => patchDataset([...list!, product])} />
           }
         />
         <Route path="debug" element={<Debug />} />

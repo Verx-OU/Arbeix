@@ -124,19 +124,22 @@ function CreateProduct({ addProduct }: CreateProductProps): JSX.Element {
 }
 
 export interface DirectoryProps {
-  products: ProductTree | null;
+  tree: ProductTree | null;
+  list: DatasetProduct[] | null;
   addToListing?: (product: DatasetProduct) => void;
+  addProduct?: (product: DatasetProduct) => void;
 }
-export default function Directory({ products, addToListing }: DirectoryProps): JSX.Element {
+export default function Directory({ tree, list, addToListing, addProduct }: DirectoryProps): JSX.Element {
   const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
+  const [creatingProduct, setCreatingProduct] = useState(false);
 
-  const hasData = products !== null;
+  const hasData = tree !== null && list !== null;
 
   let selectedProduct = undefined;
   let itemChoices = [] as string[];
   let catChoices = [] as [string, number][];
-  if (products != null) {
-    const treeNode = dig(products, path.parts);
+  if (tree != null) {
+    const treeNode = dig(tree, path.parts);
     if (path.selection !== null) {
       selectedProduct = treeNode.items.find((i) => i.name == path.selection);
     } else {
