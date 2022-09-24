@@ -15,7 +15,8 @@
     "listName": "Name",
     "listUnit": "Unit",
     "listPrice": "Price",
-    "manageProducts": "Manage products"
+    "manageProducts": "Manage products",
+    "newProduct": "Create new product"
   },
   "ee": {
     "tabHome": "Kodu",
@@ -31,6 +32,7 @@
     "listName": "Nimi",
     "listUnit": "Ühik",
     "listPrice": "Hind",
-    "manageProducts": "Halda tooteid"
+    "manageProducts": "Halda tooteid",
+    "newProduct": "Loo uus toode"
   }
 }

@@ -2,6 +2,7 @@ import {
   BreadcrumbProps,
   Button,
   ButtonGroup,
+  ControlGroup,
   H2,
   InputGroup,
   NonIdealState,
@@ -11,7 +12,7 @@ import {
 import "./Directory.css";
 import { SetState, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
 import { useNavigate } from "react-router-dom";
 import { updateLocalProducts } from "renderer/products";
@@ -58,8 +59,9 @@ const pathReset = (): Path => ({ parts: [], selection: null });
 interface DirBarProps {
   path: Path;
   setPath: Dispatch<SetStateAction<Path>>;
+  setCreatingProduct?: (bool: boolean) => void;
 }
-function DirBar({ path, setPath }: DirBarProps) {
+function DirBar({ path, setPath, setCreatingProduct }: DirBarProps) {
   const breadcrumbs: BreadcrumbProps[] = [];
   breadcrumbs.push({ text: lang.dirHeader, icon: "star", onClick: () => setPath(pathReset) });
   path.parts.forEach((i, j) =>
@@ -72,7 +74,16 @@ function DirBar({ path, setPath }: DirBarProps) {
       <Breadcrumbs2 items={breadcrumbs} />
       {breadcrumbs.length === 1 && (
         <ButtonGroup className="right">
-          <Button intent="success" icon="plus" text={lang.newProduct} />
+          {setCreatingProduct && (
+            <Button
+              intent="success"
+              icon="plus"
+              text={lang.newProduct}
+              onClick={() => {
+                setCreatingProduct(true);
+              }}
+            />
+          )}
           <Button intent="danger" icon="refresh" onClick={() => updateLocalProducts()} />
         </ButtonGroup>
       )}
@@ -117,10 +128,45 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
 }
 
 interface CreateProductProps {
+  list: DatasetProduct[];
   addProduct: (product: DatasetProduct) => void;
 }
-function CreateProduct({ addProduct }: CreateProductProps): JSX.Element {
-  return <InputGroup></InputGroup>;
+function CreateProduct({ list, addProduct }: CreateProductProps): JSX.Element {
+  const [name, setName] = useSerialState("name", "", CreateProduct);
+
+  const nextId = list.map((i) => i.id).reduce((a, b) => Math.max(a, b), 0) + 1;
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        addProduct({
+          id: nextId,
+          name: name,
+          category: "",
+          unit: "tk",
+          price: "12.00",
+        });
+        setName("");
+      }}
+    >
+      <ControlGroup>
+        <InputGroup
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="on"
+          name="product-name"
+          list="product-name"
+        />
+        <datalist id="product-name">
+          {[...new Set(list.map((i) => i.name))].map((i) => (
+            <option value={i} key={i} />
+          ))}
+        </datalist>
+        <Button intent="success" type="submit" />
+      </ControlGroup>
+    </form>
+  );
 }
 
 export interface DirectoryProps {
@@ -154,8 +200,14 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
   return (
     <>
       {hasData || <NonIdealState icon={<Spinner size={SpinnerSize.LARGE} intent="primary" />} />}
-      {hasData && <DirBar {...{ path, setPath }} />}
-      {hasData && selectedProduct === undefined && (
+      {hasData && !creatingProduct && (
+        <DirBar
+          path={path}
+          setPath={setPath}
+          setCreatingProduct={addProduct ? setCreatingProduct : undefined}
+        />
+      )}
+      {hasData && selectedProduct === undefined && !creatingProduct && (
         <div id="directory" className="inner-content">
           {catChoices.map((i) => (
             <p
@@ -174,8 +226,18 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
           ))}
         </div>
       )}
-      {hasData && selectedProduct !== undefined && (
+      {hasData && selectedProduct !== undefined && !creatingProduct && (
         <ConfirmProduct product={selectedProduct} setPath={setPath} addToListing={addToListing} />
+      )}
+      {hasData && creatingProduct && addProduct && (
+        <CreateProduct
+          list={list}
+          addProduct={(product) => {
+            setPath(pathReset());
+            setCreatingProduct(false);
+            addProduct(product);
+          }}
+        />
       )}
     </>
   );
