@@ -6,13 +6,14 @@ import {
   H2,
   InputGroup,
   NonIdealState,
+  NumericInput,
   Spinner,
   SpinnerSize,
 } from "@blueprintjs/core";
 import "./Directory.css";
 import { SetState, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
 import { useNavigate } from "react-router-dom";
 import { updateLocalProducts } from "renderer/products";
@@ -127,45 +128,87 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
   );
 }
 
+const capitalize = (s: string) => s[0]!.toUpperCase() + s.slice(1);
+
+interface InputWithListProps {
+  name: string;
+  value: string;
+  setValue: (value: string) => void;
+  list: JSX.Element[];
+}
+const InputWithList = ({ name, value, setValue, list }: InputWithListProps) => {
+  return (
+    <>
+      <InputGroup
+        placeholder={(lang as unknown as Record<string, string>)[`list${capitalize(name)}`]}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        autoComplete="on"
+        list={`product-${name}-list`}
+        fill
+      />
+      <datalist id={`product-${name}-list`}>{list}</datalist>
+    </>
+  );
+};
+
+function optionsBy<T>(list: T[], mapping: (t: T) => string): JSX.Element[] {
+  return [...new Set(list.map(mapping))].map((i) => <option value={i} key={i} />);
+}
+
 interface CreateProductProps {
   list: DatasetProduct[];
   addProduct: (product: DatasetProduct) => void;
 }
 function CreateProduct({ list, addProduct }: CreateProductProps): JSX.Element {
   const [name, setName] = useSerialState("name", "", CreateProduct);
+  const [unit, setUnit] = useSerialState("unit", "", CreateProduct);
+  const [price, setPrice] = useSerialState("price", "", CreateProduct);
 
   const nextId = list.map((i) => i.id).reduce((a, b) => Math.max(a, b), 0) + 1;
 
+  const [nameDatalist, unitDatalist] = useMemo(() => {
+    const names = optionsBy(list, (i) => i.name);
+    const units = optionsBy(list, (i) => i.unit);
+    return [names, units];
+  }, [list]);
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        addProduct({
-          id: nextId,
-          name: name,
-          category: "",
-          unit: "tk",
-          price: "12.00",
-        });
-        setName("");
-      }}
-    >
-      <ControlGroup>
-        <InputGroup
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="on"
-          name="product-name"
-          list="product-name"
-        />
-        <datalist id="product-name">
-          {[...new Set(list.map((i) => i.name))].map((i) => (
-            <option value={i} key={i} />
-          ))}
-        </datalist>
-        <Button intent="success" type="submit" />
-      </ControlGroup>
-    </form>
+    <div className="inner-content" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          addProduct({
+            id: nextId,
+            name: name,
+            category: "",
+            unit: unit,
+            price: "12.00",
+          });
+          setName("");
+          setUnit("");
+          setPrice("");
+        }}
+      >
+        <ControlGroup vertical>
+          <InputWithList name="name" value={name} setValue={setName} list={nameDatalist} />
+          <InputWithList name="unit" value={unit} setValue={setUnit} list={unitDatalist} />
+          <NumericInput
+            placeholder={lang.listPrice}
+            value={price}
+            clampValueOnBlur={true}
+            onValueChange={(_, str) => setPrice(str)}
+            min={0}
+            minorStepSize={null}
+            stepSize={0.01}
+            locale="en-US"
+            leftIcon="euro"
+            fill
+          />
+          <Button intent="success" type="submit" icon="plus" />
+        </ControlGroup>
+      </form>
+    </div>
   );
 }
 
