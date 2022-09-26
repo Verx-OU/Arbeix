@@ -1,5 +1,14 @@
-import { useEffect, useState } from "react";
-import { MemoryRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+  UNSAFE_NavigationContext as NavigationContext,
+  Navigator,
+} from "react-router-dom";
 import "./App.css";
 import Directory from "./components/Directory";
 import { DEFAULT_LOCALE } from "./locale";
@@ -14,10 +23,17 @@ import { patchDataset } from "./products";
 const LISTING_KEY = "app.listing";
 const SELECTING_PRODUCT_KEY = "app.selectingproduct";
 
+interface PatchedNavigator extends Navigator {
+  get directEntries(): Location[];
+}
+
 const Content = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [lang, setLang] = useState("");
+  // React router provides no native way to actually use the history... 2/10 package
+  const history = useContext(NavigationContext).navigator as PatchedNavigator;
+  console.dir(history.directEntries);
 
   useEffect(() => {
     const checkUserData = () => setLang(localStorage.getItem("locale") ?? DEFAULT_LOCALE);
