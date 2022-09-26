@@ -77,6 +77,12 @@ export default class MenuBuilder {
             this.mainWindow.webContents.send("change-language");
           },
         },
+        {
+          label: "Open data directory",
+          click: () => {
+            shell.openPath(app.getPath("userData"));
+          },
+        },
       ],
     };
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
