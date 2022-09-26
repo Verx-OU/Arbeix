@@ -1,18 +1,12 @@
-import { DatasetProduct, ProductTree } from "types/products";
+import { DatasetProduct, ProductFile } from "types/products";
 
 export async function readDataset() {
-  return window.electron.ipcRenderer.invoke("read-user-data", "product.csv") as Promise<
-    [ProductTree, DatasetProduct[]]
-  >;
+  return window.electron.ipcRenderer.invoke<ProductFile>("read-user-data", "product.csv");
 }
 
 export async function patchDataset(productList: DatasetProduct[]) {
   discardLocalProducts();
-  const set = window.electron.ipcRenderer.invoke(
-    "set-user-data",
-    "product.csv",
-    productList
-  ) as Promise<null>;
+  const set = window.electron.ipcRenderer.invoke<null>("set-user-data", "product.csv", productList);
   return set.then(() => fetchRemoteProducts());
 }
 

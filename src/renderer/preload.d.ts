@@ -9,7 +9,7 @@ declare global {
         sendMessage(channel: string, args: unknown[]): void;
         on(channel: string, func: (...args: unknown[]) => void): (() => void) | undefined;
         once(channel: string, func: (...args: unknown[]) => void): void;
-        invoke(channel: string, ...args: unknown[]): Promise<unknown>;
+        invoke<T>(channel: string, ...args: unknown[]): Promise<T>;
       };
     };
   }
