@@ -41,6 +41,10 @@ interface Path {
   selection: string | null;
 }
 
+const pathPopLast = (path: Path): Path => ({
+  parts: path.parts.slice(0, path.parts.length),
+  selection: null,
+});
 const pathPopTo =
   (index: number) =>
   (path: Path): Path => ({
@@ -102,10 +106,20 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
 
   return (
     <>
-      {addToListing && (
-        <div id="dir-navbar" className="top-bar">
+      <div id="dir-navbar" className="top-bar">
+        <Button
+          intent="danger"
+          text={lang.backToSelection}
+          large
+          icon="arrow-left"
+          onClick={() => {
+            setPath(pathPopLast);
+          }}
+        />
+        {addToListing && (
           <Button
             intent="success"
+            className="right"
             text={lang.addProduct}
             large
             icon="tick"
@@ -115,8 +129,8 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
               navigate(-1);
             }}
           />
-        </div>
-      )}
+        )}
+      </div>
       <div id="directory-product" className="inner-content">
         <H2 title={product.id.toString()}>
           {lang.dirProduct} {product.name}
@@ -243,7 +257,7 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
   return (
     <>
       {hasData || <NonIdealState icon={<Spinner size={SpinnerSize.LARGE} intent="primary" />} />}
-      {hasData && !creatingProduct && (
+      {hasData && selectedProduct === undefined && !creatingProduct && (
         <DirBar
           path={path}
           setPath={setPath}
