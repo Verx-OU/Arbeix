@@ -225,14 +225,14 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
   const hasData = tree !== null && list !== null;
 
   let selectedProduct = undefined;
-  let itemChoices = [] as string[];
+  let itemChoices = [] as [number, string][];
   let catChoices = [] as [string, number][];
   if (tree != null) {
     const treeNode = dig(tree, path.parts);
     if (path.selection !== null) {
       selectedProduct = treeNode.items.find((i) => i.name == path.selection);
     } else {
-      itemChoices = treeNode.items.map((i) => i.name);
+      itemChoices = treeNode.items.map((i) => [i.id, i.name]);
       catChoices = Object.keys(treeNode.categories).map((key) => [
         key,
         totalLeafItems(treeNode.categories[key]!),
@@ -252,19 +252,19 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
       )}
       {hasData && selectedProduct === undefined && !creatingProduct && (
         <div id="directory" className="inner-content">
-          {catChoices.map((i) => (
+          {catChoices.map(([name, numChildren]) => (
             <p
               className="category card clicky"
-              key={pathKey(path, i)}
-              onClick={() => setPath(pathAppend(i[0]))}
+              key={pathKey(path, name)}
+              onClick={() => setPath(pathAppend(name))}
             >
-              {i[0]}…<span className="number">({i[1]})</span>
+              {name}…<span className="number">({numChildren})</span>
             </p>
           ))}
           {catChoices.length > 0 && itemChoices.length > 0 && <hr className="separator" />}
-          {itemChoices.map((i) => (
-            <p className="card clicky" key={pathKey(path, i)} onClick={() => setPath(pathSelect(i))}>
-              {i}
+          {itemChoices.map(([id, name]) => (
+            <p className="card clicky" key={id} onClick={() => setPath(pathSelect(name))}>
+              {name}
             </p>
           ))}
         </div>
