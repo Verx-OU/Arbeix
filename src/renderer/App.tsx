@@ -82,7 +82,7 @@ const Content = () => {
               listing={listing}
               goSelectProduct={() => {
                 setSelectingProduct(true);
-                navigate("dir");
+                navigate("/dir");
               }}
             />
           }
@@ -96,8 +96,8 @@ const Content = () => {
               addToListing={(product) => {
                 setSelectingProduct(false);
                 setListing((list) => [...list, product]);
-                navigate("list");
               }}
+              addProduct={(product) => patchDataset([...list!, product])}
             />
           }
         />

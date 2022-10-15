@@ -222,7 +222,7 @@ export interface DirectoryProps {
   tree: ProductTree | null;
   list: DatasetProduct[] | null;
   addToListing?: (product: DatasetProduct) => void;
-  addProduct?: (product: DatasetProduct) => void;
+  addProduct: (product: DatasetProduct) => void;
 }
 export default function Directory({ tree, list, addToListing, addProduct }: DirectoryProps): JSX.Element {
   const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
@@ -263,12 +263,12 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
       )}
       {hasData && selectedProduct === undefined && !creatingProduct && (
         <div id="directory" className="inner-content">
-          {addProduct && !creatingCategory && (
+          {!creatingCategory && (
             <span className="category card clicky green" onClick={() => setCreatingCategory(true)}>
               {lang.newCategory}
             </span>
           )}
-          {addProduct && creatingCategory && (
+          {creatingCategory && (
             <span className="category card blue">
               <ControlGroup vertical fill>
                 <InputGroup value={newCateogryName} onChange={(e) => setNewCategoryName(e.target.value)} />
@@ -297,11 +297,11 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
             </span>
           ))}
           {<hr className="separator" />}
-          {addProduct && (
+          {
             <span className="card clicky green" onClick={() => setCreatingProduct(true)}>
               {lang.newProduct}
             </span>
-          )}
+          }
           {itemChoices.map(([id, name]) => (
             <span className="card clicky" key={id} onClick={() => setPath(pathSelect(name))}>
               {name}
@@ -312,7 +312,7 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
       {hasData && selectedProduct !== undefined && !creatingProduct && (
         <ConfirmProduct product={selectedProduct} setPath={setPath} addToListing={addToListing} />
       )}
-      {hasData && creatingProduct && addProduct && (
+      {hasData && creatingProduct && (
         <CreateProduct
           path={path}
           list={list}
