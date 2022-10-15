@@ -10,22 +10,34 @@ export function maybeParseJSON<T>(string: string | null): T | null {
 }
 
 export type SetState<A> = React.Dispatch<SetStateAction<A>>;
+export type SetStateWithCB<A> = (value: SetStateAction<A>, callback?: React.Dispatch<A>) => void;
 type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
 export function useSerialState<Key, S, E = unknown>(
   key: StringLiteral<Key>,
   defaultState: S,
   element?: React.FC<E>
-): [S, SetState<S>] {
+): [S, SetStateWithCB<S>] {
   const location = useLocation();
+  const callbackRef = React.useRef<React.Dispatch<S> | undefined>(undefined);
   const prefix = element ? `${location.pathname}/${element?.displayName ?? element?.name ?? "."}` : `!`;
   const fullKey = `@${prefix}/${key}`;
   const [state, setStateDirect] = useState<S>(() =>
     tryParseJSON(localStorage.getItem(fullKey), defaultState)
   );
-  const setState = (stateAction: SetStateAction<S>) => {
+
+  React.useEffect(() => {
+    if (callbackRef.current) {
+      callbackRef.current(state);
+
+      callbackRef.current = undefined;
+    }
+  }, [state]);
+
+  const setState = (stateAction: SetStateAction<S>, callback?: React.Dispatch<S>) => {
     setStateDirect((value) => {
       const modified = stateAction instanceof Function ? stateAction(value) : stateAction;
       localStorage.setItem(fullKey, JSON.stringify(modified));
+      callbackRef.current = callback;
       return modified;
     });
   };

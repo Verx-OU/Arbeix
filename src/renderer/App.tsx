@@ -96,6 +96,7 @@ const Content = () => {
               addToListing={(product) => {
                 setSelectingProduct(false);
                 setListing((list) => [...list, product]);
+                navigate(-1);
               }}
               addProduct={(product) => patchDataset([...list!, product])}
             />

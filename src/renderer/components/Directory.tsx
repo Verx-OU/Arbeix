@@ -11,7 +11,7 @@ import {
   SpinnerSize,
 } from "@blueprintjs/core";
 import "./Directory.css";
-import { SetState, useSerialState } from "../serial";
+import { SetState, SetStateWithCB, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
@@ -89,12 +89,10 @@ function DirBar({ path, setPath }: DirBarProps) {
 
 interface ConfirmProductProps {
   product: DatasetProduct;
-  setPath: SetState<Path>;
+  setPath: SetStateWithCB<Path>;
   addToListing?: (product: DatasetProduct) => void;
 }
 function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps) {
-  const navigate = useNavigate();
-
   return (
     <>
       <div id="dir-navbar" className="top-bar">
@@ -114,11 +112,7 @@ function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps)
             text={lang.addProduct}
             large
             icon="tick"
-            onClick={async () => {
-              setPath(pathReset());
-              addToListing(product);
-              navigate(-1);
-            }}
+            onClick={() => setPath(pathReset(), () => addToListing(product))}
           />
         )}
       </div>
