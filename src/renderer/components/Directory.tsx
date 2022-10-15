@@ -11,11 +11,10 @@ import {
   SpinnerSize,
 } from "@blueprintjs/core";
 import "./Directory.css";
-import { SetState, SetStateWithCB, useSerialState } from "../serial";
+import { SetStateWithCB, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
-import { useNavigate } from "react-router-dom";
 import { updateLocalProducts } from "renderer/products";
 
 const DIR_KEY = "dir.path";
