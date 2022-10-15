@@ -25,7 +25,11 @@ export default function Debug() {
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <FileInputWrapper default="template" state={templatePath} setState={setTemplatePath} />
-      <InputGroup defaultValue={sheet} onChange={(event) => setSheet(event.target.value)} />
+      <InputGroup
+        placeholder="Sheet"
+        defaultValue={sheet}
+        onChange={(event) => setSheet(event.target.value)}
+      />
       <div style={{ display: "flex", flexDirection: "row" }}>
         <div>
           <ControlGroup vertical>
@@ -74,7 +78,12 @@ export default function Debug() {
           intent="warning"
           icon="double-chevron-right"
           onClick={() => {
-            window.electron.ipcRenderer.invoke("proc", templatePath, sheet, schema);
+            const today = new Date();
+            const schemaWithDate: Schema = {
+              ...schema,
+              KUUPAEV: { date: [today.getFullYear(), today.getMonth(), today.getDate()] },
+            };
+            window.electron.ipcRenderer.invoke("proc", templatePath, sheet, schemaWithDate);
           }}
         />
         <Button
