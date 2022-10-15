@@ -31,6 +31,18 @@
   max-height: max-content;
 }
 
+#directory .card.green {
+  border-style: dashed;
+  color: #99d999;
+  background-color: #284828;
+}
+
+#directory .card.blue {
+  border-style: dotted;
+  color: #9999d9;
+  background-color: #282848;
+}
+
 #directory .card .number {
   margin-left: auto;
   justify-self: flex-end;
@@ -48,7 +60,8 @@
   background-color: #222;
 }
 
-#dir-navbar li, #dir-navbar .bp4-breadcrumb {
+#dir-navbar li,
+#dir-navbar .bp4-breadcrumb {
   font-size: 1.8rem;
 }
 

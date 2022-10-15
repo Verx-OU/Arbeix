@@ -20,12 +20,14 @@ import { updateLocalProducts } from "renderer/products";
 
 const DIR_KEY = "dir.path";
 
-const EMPTY_PRODUCT_TREE: Readonly<ProductTree> = { categories: {}, items: [] };
+function emptyProductTree(): ProductTree {
+  return { categories: {}, items: [] };
+}
 
-function dig(data: ProductTree, path: string[]): Readonly<ProductTree> {
+function dig(data: ProductTree, path: string[]): ProductTree {
   let ref = data;
   for (const i of path.filter((i) => i !== "")) {
-    ref = ref.categories[i] ?? EMPTY_PRODUCT_TREE;
+    ref = ref.categories[i] ?? emptyProductTree();
   }
   return ref;
 }
@@ -64,9 +66,8 @@ const pathReset = (): Path => ({ parts: [], selection: null });
 interface DirBarProps {
   path: Path;
   setPath: Dispatch<SetStateAction<Path>>;
-  setCreatingProduct?: (bool: boolean) => void;
 }
-function DirBar({ path, setPath, setCreatingProduct }: DirBarProps) {
+function DirBar({ path, setPath }: DirBarProps) {
   const breadcrumbs: BreadcrumbProps[] = [];
   breadcrumbs.push({ text: lang.dirHeader, icon: "star", onClick: () => setPath(pathReset) });
   path.parts.forEach((i, j) =>
@@ -79,16 +80,6 @@ function DirBar({ path, setPath, setCreatingProduct }: DirBarProps) {
       <Breadcrumbs2 items={breadcrumbs} />
       {breadcrumbs.length === 1 && (
         <ButtonGroup className="right">
-          {setCreatingProduct && (
-            <Button
-              intent="success"
-              icon="plus"
-              text={lang.newProduct}
-              onClick={() => {
-                setCreatingProduct(true);
-              }}
-            />
-          )}
           <Button intent="danger" icon="refresh" onClick={() => updateLocalProducts()} />
         </ButtonGroup>
       )}
@@ -171,10 +162,11 @@ function optionsBy<T>(list: T[], mapping: (t: T) => string): JSX.Element[] {
 }
 
 interface CreateProductProps {
+  path: Path;
   list: DatasetProduct[];
   addProduct: (product: DatasetProduct) => void;
 }
-function CreateProduct({ list, addProduct }: CreateProductProps): JSX.Element {
+function CreateProduct({ path, list, addProduct }: CreateProductProps): JSX.Element {
   const [name, setName] = useSerialState("name", "", CreateProduct);
   const [unit, setUnit] = useSerialState("unit", "", CreateProduct);
   const [price, setPrice] = useSerialState("price", "", CreateProduct);
@@ -192,16 +184,16 @@ function CreateProduct({ list, addProduct }: CreateProductProps): JSX.Element {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          addProduct({
-            id: nextId,
-            name: name,
-            category: "",
-            unit: unit,
-            price: "12.00",
-          });
           setName("");
           setUnit("");
           setPrice("");
+          addProduct({
+            id: nextId,
+            name: name,
+            category: path.parts.join("/"),
+            unit: unit,
+            price: "12.00",
+          });
         }}
       >
         <ControlGroup vertical>
@@ -235,6 +227,8 @@ export interface DirectoryProps {
 export default function Directory({ tree, list, addToListing, addProduct }: DirectoryProps): JSX.Element {
   const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
   const [creatingProduct, setCreatingProduct] = useState(false);
+  const [creatingCategory, setCreatingCategory] = useState(false);
+  const [newCateogryName, setNewCategoryName] = useState("");
 
   const hasData = tree !== null && list !== null;
 
@@ -257,29 +251,61 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
   return (
     <>
       {hasData || <NonIdealState icon={<Spinner size={SpinnerSize.LARGE} intent="primary" />} />}
-      {hasData && selectedProduct === undefined && !creatingProduct && (
+      {hasData && selectedProduct === undefined && (
         <DirBar
           path={path}
-          setPath={setPath}
-          setCreatingProduct={addProduct ? setCreatingProduct : undefined}
+          setPath={(p) => {
+            setCreatingProduct(false);
+            setCreatingCategory(false);
+            setPath(p);
+          }}
         />
       )}
       {hasData && selectedProduct === undefined && !creatingProduct && (
         <div id="directory" className="inner-content">
+          {addProduct && !creatingCategory && (
+            <span className="category card clicky green" onClick={() => setCreatingCategory(true)}>
+              {lang.newCategory}
+            </span>
+          )}
+          {addProduct && creatingCategory && (
+            <span className="category card blue">
+              <ControlGroup vertical fill>
+                <InputGroup value={newCateogryName} onChange={(e) => setNewCategoryName(e.target.value)} />
+                <ButtonGroup fill>
+                  <Button intent="danger" icon="arrow-left" onClick={() => setCreatingCategory(false)} />
+                  <Button
+                    intent="success"
+                    icon="plus"
+                    onClick={() => {
+                      dig(tree, path.parts).categories[newCateogryName] = emptyProductTree();
+                      setCreatingCategory(false);
+                      setNewCategoryName("");
+                    }}
+                  />
+                </ButtonGroup>
+              </ControlGroup>
+            </span>
+          )}
           {catChoices.map(([name, numChildren]) => (
-            <p
+            <span
               className="category card clicky"
               key={pathKey(path, name)}
               onClick={() => setPath(pathAppend(name))}
             >
               {name}…<span className="number">({numChildren})</span>
-            </p>
+            </span>
           ))}
-          {catChoices.length > 0 && itemChoices.length > 0 && <hr className="separator" />}
+          {<hr className="separator" />}
+          {addProduct && (
+            <span className="card clicky green" onClick={() => setCreatingProduct(true)}>
+              {lang.newProduct}
+            </span>
+          )}
           {itemChoices.map(([id, name]) => (
-            <p className="card clicky" key={id} onClick={() => setPath(pathSelect(name))}>
+            <span className="card clicky" key={id} onClick={() => setPath(pathSelect(name))}>
               {name}
-            </p>
+            </span>
           ))}
         </div>
       )}
@@ -288,9 +314,10 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
       )}
       {hasData && creatingProduct && addProduct && (
         <CreateProduct
+          path={path}
           list={list}
           addProduct={(product) => {
-            setPath(pathReset());
+            // setPath(pathReset());
             setCreatingProduct(false);
             addProduct(product);
           }}
