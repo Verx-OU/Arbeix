@@ -18,7 +18,9 @@
     "listPrice": "Price",
     "manageProducts": "Manage products",
     "newProduct": "Create new product",
-    "newCategory": "Create new category"
+    "newCategory": "Create new category",
+    "calloutWarn": "Note",
+    "warnAddProductEditing": "Modifications made here will only apply this time, and not to future uses of the same product."
   },
   "ee": {
     "tabHome": "Kodu",
@@ -37,6 +39,8 @@
     "listPrice": "Hind",
     "manageProducts": "Halda tooteid",
     "newProduct": "Loo uus toode",
-    "newCategory": "Loo uus kategooria"
+    "newCategory": "Loo uus kategooria",
+    "calloutWarn": "NB!",
+    "warnAddProductEditing": "Siin tehtud muudatused kehtivad vaid praegusel korral ning mitte sama toote tulevastel kasutustel."
   }
 }

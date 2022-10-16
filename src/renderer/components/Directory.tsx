@@ -2,7 +2,9 @@ import {
   BreadcrumbProps,
   Button,
   ButtonGroup,
+  Callout,
   ControlGroup,
+  FormGroup,
   H2,
   InputGroup,
   NonIdealState,
@@ -11,7 +13,7 @@ import {
   SpinnerSize,
 } from "@blueprintjs/core";
 import "./Directory.css";
-import { SetStateWithCB, useSerialState } from "../serial";
+import { SetState, SetStateWithCB, useSerialState } from "../serial";
 import { DatasetProduct, ProductTree } from "types/products";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Breadcrumbs2 } from "@blueprintjs/popover2";
@@ -43,10 +45,6 @@ interface Path {
   creatingProduct?: boolean;
 }
 
-const pathPopLast = (path: Path): Path => ({
-  parts: path.parts.slice(0, path.parts.length),
-  selection: null,
-});
 const pathPopTo =
   (index: number) =>
   (path: Path): Path => ({
@@ -89,41 +87,36 @@ function DirBar({ path, setPath }: DirBarProps) {
 
 interface ConfirmProductProps {
   product: DatasetProduct;
+  path: Path;
   setPath: SetStateWithCB<Path>;
+  list: DatasetProduct[];
   addToListing?: (product: DatasetProduct) => void;
 }
-function ConfirmProduct({ product, setPath, addToListing }: ConfirmProductProps) {
+function ConfirmProduct({ product, path, list, setPath, addToListing }: ConfirmProductProps) {
   return (
-    <>
-      <div id="dir-navbar" className="top-bar">
-        <Button
-          intent="danger"
-          text={lang.backToSelection}
-          large
-          icon="arrow-left"
-          onClick={() => {
-            setPath(pathPopLast);
+    <div id="directory-product" className="inner-content">
+      <H2 title={product.id.toString()}>
+        {lang.dirProduct} {product.name}
+      </H2>
+      {addToListing ? (
+        <CreateProduct
+          path={path}
+          list={list}
+          note={lang.warnAddProductEditing}
+          store="Confirm"
+          hideName
+          initial={product}
+          addProduct={(product) => {
+            setPath(pathReset(), () => addToListing(product));
           }}
         />
-        {addToListing && (
-          <Button
-            intent="success"
-            className="right"
-            text={lang.addProduct}
-            large
-            icon="tick"
-            onClick={() => setPath(pathReset(), () => addToListing(product))}
-          />
-        )}
-      </div>
-      <div id="directory-product" className="inner-content">
-        <H2 title={product.id.toString()}>
-          {lang.dirProduct} {product.name}
-        </H2>
-        <p>{product.unit}</p>
-        <p>{product.price}</p>
-      </div>
-    </>
+      ) : (
+        <>
+          <p>{product.unit}</p>
+          <p>{product.price}</p>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -136,10 +129,11 @@ interface InputWithListProps {
   list: JSX.Element[];
 }
 const InputWithList = ({ name, value, setValue, list }: InputWithListProps) => {
+  const label = (lang as unknown as Record<string, string>)[`list${capitalize(name)}`];
   return (
-    <>
+    <FormGroup label={label}>
       <InputGroup
-        placeholder={(lang as unknown as Record<string, string>)[`list${capitalize(name)}`]}
+        placeholder={label}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         autoComplete="on"
@@ -147,7 +141,7 @@ const InputWithList = ({ name, value, setValue, list }: InputWithListProps) => {
         fill
       />
       <datalist id={`product-${name}-list`}>{list}</datalist>
-    </>
+    </FormGroup>
   );
 };
 
@@ -159,11 +153,29 @@ interface CreateProductProps {
   path: Path;
   list: DatasetProduct[];
   addProduct: (product: DatasetProduct) => void;
+  note?: JSX.Element | string;
+  store?: string;
+  initial?: Partial<DatasetProduct>;
+  hideName?: boolean;
 }
-function CreateProduct({ path, list, addProduct }: CreateProductProps): JSX.Element {
-  const [name, setName] = useSerialState("name", "", CreateProduct);
-  const [unit, setUnit] = useSerialState("unit", "", CreateProduct);
-  const [price, setPrice] = useSerialState("price", "", CreateProduct);
+function CreateProduct({
+  path,
+  list,
+  addProduct,
+  note,
+  store,
+  initial,
+  hideName,
+}: CreateProductProps): JSX.Element {
+  function useSerialOrProvided<T>(field: string, provided: T | undefined, defaultValue: T): [T, SetState<T>] {
+    const serial = useSerialState(`${field}${store ?? ""}`, defaultValue, CreateProduct);
+    const state = useState<T>(provided ?? defaultValue);
+    return provided !== undefined ? state : serial;
+  }
+
+  const [name, setName] = useSerialOrProvided("name", initial?.name, "");
+  const [unit, setUnit] = useSerialOrProvided("unit", initial?.unit, "");
+  const [price, setPrice] = useSerialOrProvided("price", initial?.price, "");
 
   const nextId = list.map((i) => i.id).reduce((a, b) => Math.max(a, b), 0) + 1;
 
@@ -174,8 +186,9 @@ function CreateProduct({ path, list, addProduct }: CreateProductProps): JSX.Elem
   }, [list]);
 
   return (
-    <div className="inner-content" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div>
       <form
+        style={{ display: "inline-flex", flexDirection: "column" }}
         onSubmit={(e) => {
           e.preventDefault();
           setName("");
@@ -186,28 +199,39 @@ function CreateProduct({ path, list, addProduct }: CreateProductProps): JSX.Elem
             name: name,
             category: path.parts.join("/"),
             unit: unit,
-            price: "12.00",
+            price: price,
           });
         }}
       >
         <ControlGroup vertical>
-          <InputWithList name="name" value={name} setValue={setName} list={nameDatalist} />
+          {!hideName && <InputWithList name="name" value={name} setValue={setName} list={nameDatalist} />}
           <InputWithList name="unit" value={unit} setValue={setUnit} list={unitDatalist} />
-          <NumericInput
-            placeholder={lang.listPrice}
-            value={price}
-            clampValueOnBlur={true}
-            onValueChange={(_, str) => setPrice(str)}
-            min={0}
-            minorStepSize={null}
-            stepSize={0.01}
-            locale="en-US"
-            leftIcon="euro"
-            fill
-          />
+          <FormGroup label={lang.listPrice}>
+            <NumericInput
+              placeholder={lang.listPrice}
+              value={price}
+              clampValueOnBlur={true}
+              onValueChange={(_, str) => setPrice(str)}
+              min={0}
+              minorStepSize={null}
+              stepSize={0.01}
+              locale="en-US"
+              leftIcon="euro"
+              fill
+            />
+          </FormGroup>
           <Button intent="success" type="submit" icon="plus" />
         </ControlGroup>
       </form>
+      {note && (
+        <Callout
+          style={{ marginTop: "3rem", width: "max-content" }}
+          intent="warning"
+          title={lang.calloutWarn}
+        >
+          {note}
+        </Callout>
+      )}
     </div>
   );
 }
@@ -246,7 +270,7 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
   return (
     <>
       {hasData || <NonIdealState icon={<Spinner size={SpinnerSize.LARGE} intent="primary" />} />}
-      {hasData && selectedProduct === undefined && (
+      {hasData && (
         <DirBar
           path={path}
           setPath={(p) => {
@@ -305,18 +329,26 @@ export default function Directory({ tree, list, addToListing, addProduct }: Dire
         </div>
       )}
       {hasData && selectedProduct !== undefined && !creatingProduct && (
-        <ConfirmProduct product={selectedProduct} setPath={setPath} addToListing={addToListing} />
-      )}
-      {hasData && creatingProduct && (
-        <CreateProduct
+        <ConfirmProduct
+          product={selectedProduct}
           path={path}
           list={list}
-          addProduct={(product) => {
-            // setPath(pathReset());
-            setCreatingProduct(false);
-            addProduct(product);
-          }}
+          setPath={setPath}
+          addToListing={addToListing}
         />
+      )}
+      {hasData && creatingProduct && (
+        <div className="inner-content">
+          <CreateProduct
+            path={path}
+            list={list}
+            addProduct={(product) => {
+              // setPath(pathReset());
+              setCreatingProduct(false);
+              addProduct(product);
+            }}
+          />
+        </div>
       )}
     </>
   );

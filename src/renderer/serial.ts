@@ -12,8 +12,8 @@ export function maybeParseJSON<T>(string: string | null): T | null {
 export type SetState<A> = React.Dispatch<SetStateAction<A>>;
 export type SetStateWithCB<A> = (value: SetStateAction<A>, callback?: React.Dispatch<A>) => void;
 type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
-export function useSerialState<Key, S, E = unknown>(
-  key: StringLiteral<Key>,
+export function useSerialState<S, E = unknown>(
+  key: string,
   defaultState: S,
   element?: React.FC<E>
 ): [S, SetStateWithCB<S>] {
