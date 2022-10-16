@@ -40,6 +40,7 @@ function totalLeafItems(root: ProductTree): number {
 interface Path {
   parts: string[];
   selection: string | null;
+  creatingProduct?: boolean;
 }
 
 const pathPopLast = (path: Path): Path => ({
@@ -219,10 +220,11 @@ export interface DirectoryProps {
 }
 export default function Directory({ tree, list, addToListing, addProduct }: DirectoryProps): JSX.Element {
   const [path, setPath] = useSerialState(DIR_KEY, pathReset(), Directory);
-  const [creatingProduct, setCreatingProduct] = useState(false);
   const [creatingCategory, setCreatingCategory] = useState(false);
   const [newCateogryName, setNewCategoryName] = useState("");
 
+  const creatingProduct = !!path.creatingProduct;
+  const setCreatingProduct = (value: boolean) => setPath((path) => ({ ...path, creatingProduct: value }));
   const hasData = tree !== null && list !== null;
 
   let selectedProduct = undefined;
