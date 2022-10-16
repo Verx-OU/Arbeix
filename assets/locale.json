@@ -4,7 +4,7 @@
     "tabTest": "Test",
     "tabList": "Project",
     "tabDir": "Dir",
-    "tabDebug": "Debug",
+    "tabDebug": "(In Development)",
     "goToHome": "Home",
     "back": "Back",
     "backToSelection": "Back to product selection",
@@ -20,7 +20,8 @@
     "newProduct": "Create new product",
     "newCategory": "Create new category",
     "calloutWarn": "Note",
-    "warnAddProductEditing": "Modifications made here will only apply this time, and not to future uses of the same product."
+    "warnAddProductEditing": "Modifications made here will only apply this time, and not to future uses of the same product.",
+    "debugPushToSchema": "(In Development) Push to schema"
   },
   "ee": {
     "tabHome": "Kodu",
@@ -41,6 +42,7 @@
     "newProduct": "Loo uus toode",
     "newCategory": "Loo uus kategooria",
     "calloutWarn": "NB!",
-    "warnAddProductEditing": "Siin tehtud muudatused kehtivad vaid praegusel korral ning mitte sama toote tulevastel kasutustel."
+    "warnAddProductEditing": "Siin tehtud muudatused kehtivad vaid praegusel korral ning mitte sama toote tulevastel kasutustel.",
+    "debugPushToSchema": "(Arendamisel) Push to schema"
   }
 }

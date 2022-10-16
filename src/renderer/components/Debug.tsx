@@ -1,6 +1,25 @@
 import { Button, ButtonGroup, ControlGroup, FileInput, InputGroup } from "@blueprintjs/core";
-import { SetState, useSerialState } from "renderer/serial";
+import { SetState, tryParseJSON, useSerialState } from "renderer/serial";
 import { AggregateReplacement, EmailReplacement, Schema } from "types/ods";
+import { DatasetProduct } from "types/products";
+
+export function pushProductToDebugSchema(product: DatasetProduct) {
+  const key = "@!/debug.proc.schema";
+  const schema = tryParseJSON<Schema>(localStorage.getItem(key), {});
+  const products = (schema["M"] ?? []) as AggregateReplacement;
+
+  const newProductReplacement = {
+    NIMI: product.name,
+    MU: product.unit,
+    MAHT: 1,
+    HIND: product.price,
+    KASUM: 0,
+    MUUA: "Täitmata",
+  };
+
+  const modified: Schema = { ...schema, M: [...products, newProductReplacement] };
+  localStorage.setItem(key, JSON.stringify(modified));
+}
 
 export default function Debug() {
   const [templatePath, setTemplatePath] = useSerialState("debug.proc.template", "");
